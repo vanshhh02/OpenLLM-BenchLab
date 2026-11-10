@@ -241,6 +241,30 @@ class BatchInferenceResponse(BaseModel):
     throughput_tps: float
 
 
+class KVCacheStatsRequest(BaseModel):
+    batch_size: int = 1
+    context_length: int = 2048
+    num_layers: int = 24
+    num_kv_heads: int = 2
+    head_dim: int = 64
+    precision: str = "fp16"
+
+
+class KVCacheStatsResponse(BaseModel):
+    batch_size: int
+    context_length: int
+    num_layers: int
+    num_kv_heads: int
+    head_dim: int
+    precision: str
+    bytes_per_element: float
+    total_elements: int
+    total_bytes: int
+    total_memory_mb: float
+    memory_per_token_bytes: float
+    scaling_curve: List[Dict[str, Any]]
+
+
 class LoadTestRequest(BaseModel):
     model_id: str = "Qwen/Qwen2.5-0.5B-Instruct"
     concurrency_levels: List[int] = Field(default_factory=lambda: [1, 5, 10])

@@ -1,0 +1,257 @@
+{
+  "sweep_id": "loadtest_1794291319",
+  "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+  "engine": "pytorch_mps",
+  "concurrency_levels": [
+    1,
+    5,
+    10
+  ],
+  "requests_per_level": 5,
+  "levels": [
+    {
+      "id": "bench_loadtest_1794291319_c1",
+      "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+      "benchmark_type": "concurrent_load_test",
+      "concurrency_level": 1,
+      "num_requests": 5,
+      "successful_requests": 5,
+      "failed_requests": 0,
+      "p50_latency_ms": 1137.02,
+      "p95_latency_ms": 4703.42,
+      "p99_latency_ms": 5414.31,
+      "avg_latency_ms": 1993.83,
+      "avg_ttft_ms": 90.63,
+      "requests_per_second": 0.29,
+      "tokens_per_second": 9.43,
+      "peak_memory_mb": 278.78,
+      "engine": "pytorch_mps",
+      "kv_cache_usage_mb": 1.5,
+      "metrics_json": {
+        "total_wall_time_sec": 16.97,
+        "total_tokens_generated": 160,
+        "kv_cache_details": {
+          "batch_size": 1,
+          "context_length": 128,
+          "num_layers": 24,
+          "num_kv_heads": 2,
+          "head_dim": 64,
+          "precision": "fp16",
+          "bytes_per_element": 2.0,
+          "total_elements": 786432,
+          "total_bytes": 1572864,
+          "total_memory_mb": 1.5,
+          "memory_per_token_bytes": 12288.0,
+          "scaling_curve": [
+            {
+              "context_length": 512,
+              "batch_size": 1,
+              "memory_mb": 6.0,
+              "memory_gb": 0.0059
+            },
+            {
+              "context_length": 1024,
+              "batch_size": 1,
+              "memory_mb": 12.0,
+              "memory_gb": 0.0117
+            },
+            {
+              "context_length": 2048,
+              "batch_size": 1,
+              "memory_mb": 24.0,
+              "memory_gb": 0.0234
+            },
+            {
+              "context_length": 4096,
+              "batch_size": 1,
+              "memory_mb": 48.0,
+              "memory_gb": 0.0469
+            },
+            {
+              "context_length": 8192,
+              "batch_size": 1,
+              "memory_mb": 96.0,
+              "memory_gb": 0.0938
+            },
+            {
+              "context_length": 16384,
+              "batch_size": 1,
+              "memory_mb": 192.0,
+              "memory_gb": 0.1875
+            },
+            {
+              "context_length": 32768,
+              "batch_size": 1,
+              "memory_mb": 384.0,
+              "memory_gb": 0.375
+            }
+          ]
+        }
+      },
+      "created_at": "2026-11-10T06:15:36.230700"
+    },
+    {
+      "id": "bench_loadtest_1794291319_c5",
+      "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+      "benchmark_type": "concurrent_load_test",
+      "concurrency_level": 5,
+      "num_requests": 5,
+      "successful_requests": 5,
+      "failed_requests": 0,
+      "p50_latency_ms": 6691.31,
+      "p95_latency_ms": 6707.19,
+      "p99_latency_ms": 6707.35,
+      "avg_latency_ms": 6683.56,
+      "avg_ttft_ms": 303.8,
+      "requests_per_second": 0.74,
+      "tokens_per_second": 23.7,
+      "peak_memory_mb": 87.78,
+      "engine": "pytorch_mps",
+      "kv_cache_usage_mb": 7.5,
+      "metrics_json": {
+        "total_wall_time_sec": 6.75,
+        "total_tokens_generated": 160,
+        "kv_cache_details": {
+          "batch_size": 5,
+          "context_length": 128,
+          "num_layers": 24,
+          "num_kv_heads": 2,
+          "head_dim": 64,
+          "precision": "fp16",
+          "bytes_per_element": 2.0,
+          "total_elements": 3932160,
+          "total_bytes": 7864320,
+          "total_memory_mb": 7.5,
+          "memory_per_token_bytes": 12288.0,
+          "scaling_curve": [
+            {
+              "context_length": 512,
+              "batch_size": 5,
+              "memory_mb": 30.0,
+              "memory_gb": 0.0293
+            },
+            {
+              "context_length": 1024,
+              "batch_size": 5,
+              "memory_mb": 60.0,
+              "memory_gb": 0.0586
+            },
+            {
+              "context_length": 2048,
+              "batch_size": 5,
+              "memory_mb": 120.0,
+              "memory_gb": 0.1172
+            },
+            {
+              "context_length": 4096,
+              "batch_size": 5,
+              "memory_mb": 240.0,
+              "memory_gb": 0.2344
+            },
+            {
+              "context_length": 8192,
+              "batch_size": 5,
+              "memory_mb": 480.0,
+              "memory_gb": 0.4688
+            },
+            {
+              "context_length": 16384,
+              "batch_size": 5,
+              "memory_mb": 960.0,
+              "memory_gb": 0.9375
+            },
+            {
+              "context_length": 32768,
+              "batch_size": 5,
+              "memory_mb": 1920.0,
+              "memory_gb": 1.875
+            }
+          ]
+        }
+      },
+      "created_at": "2026-11-10T06:15:43.030637"
+    },
+    {
+      "id": "bench_loadtest_1794291319_c10",
+      "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+      "benchmark_type": "concurrent_load_test",
+      "concurrency_level": 10,
+      "num_requests": 5,
+      "successful_requests": 5,
+      "failed_requests": 0,
+      "p50_latency_ms": 6687.85,
+      "p95_latency_ms": 6711.77,
+      "p99_latency_ms": 6714.34,
+      "avg_latency_ms": 6689.19,
+      "avg_ttft_ms": 304.05,
+      "requests_per_second": 0.73,
+      "tokens_per_second": 23.45,
+      "peak_memory_mb": 73.25,
+      "engine": "pytorch_mps",
+      "kv_cache_usage_mb": 15.0,
+      "metrics_json": {
+        "total_wall_time_sec": 6.82,
+        "total_tokens_generated": 160,
+        "kv_cache_details": {
+          "batch_size": 10,
+          "context_length": 128,
+          "num_layers": 24,
+          "num_kv_heads": 2,
+          "head_dim": 64,
+          "precision": "fp16",
+          "bytes_per_element": 2.0,
+          "total_elements": 7864320,
+          "total_bytes": 15728640,
+          "total_memory_mb": 15.0,
+          "memory_per_token_bytes": 12288.0,
+          "scaling_curve": [
+            {
+              "context_length": 512,
+              "batch_size": 10,
+              "memory_mb": 60.0,
+              "memory_gb": 0.0586
+            },
+            {
+              "context_length": 1024,
+              "batch_size": 10,
+              "memory_mb": 120.0,
+              "memory_gb": 0.1172
+            },
+            {
+              "context_length": 2048,
+              "batch_size": 10,
+              "memory_mb": 240.0,
+              "memory_gb": 0.2344
+            },
+            {
+              "context_length": 4096,
+              "batch_size": 10,
+              "memory_mb": 480.0,
+              "memory_gb": 0.4688
+            },
+            {
+              "context_length": 8192,
+              "batch_size": 10,
+              "memory_mb": 960.0,
+              "memory_gb": 0.9375
+            },
+            {
+              "context_length": 16384,
+              "batch_size": 10,
+              "memory_mb": 1920.0,
+              "memory_gb": 1.875
+            },
+            {
+              "context_length": 32768,
+              "batch_size": 10,
+              "memory_mb": 3840.0,
+              "memory_gb": 3.75
+            }
+          ]
+        }
+      },
+      "created_at": "2026-11-10T06:15:49.861524"
+    }
+  ],
+  "created_at": "2026-11-10T06:15:49.869754"
+}

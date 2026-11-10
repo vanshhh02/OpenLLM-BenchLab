@@ -9,7 +9,16 @@ from typing import Any, Dict
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.app.api.v1.endpoints import datasets, evaluation, experiments, models, quantization, training
+from backend.app.api.v1.endpoints import (
+    benchmark,
+    datasets,
+    evaluation,
+    experiments,
+    inference,
+    models,
+    quantization,
+    training,
+)
 from backend.app.core.hardware import detect_hardware
 from backend.app.database.session import init_db
 from backend.app.schemas.api_schemas import HardwareInfoResponse
@@ -63,6 +72,8 @@ app.include_router(evaluation.router, prefix="/api/evaluation", tags=["Evaluatio
 app.include_router(experiments.router, prefix="/api/experiments", tags=["Experiments"])
 app.include_router(training.router, prefix="/api/training", tags=["Fine-Tuning"])
 app.include_router(quantization.router, prefix="/api/quantization", tags=["Quantization"])
+app.include_router(inference.router, prefix="/api/inference", tags=["Inference"])
+app.include_router(benchmark.router, prefix="/api/benchmark", tags=["Benchmarking"])
 
 
 @app.get("/api/health", tags=["System"])

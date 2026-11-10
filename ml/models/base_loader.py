@@ -10,6 +10,14 @@ from typing import Any, Dict, Optional, Tuple
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
+# Fix for PyTorch 2.15 MPSEvent nil assertion on macOS Metal Performance Shaders
+try:
+    import transformers.generation.utils as _gen_utils
+    if hasattr(_gen_utils, "DeferredStopCheck"):
+        _gen_utils.DeferredStopCheck.is_supported = staticmethod(lambda *args, **kwargs: False)
+except Exception:
+    pass
+
 from ml.core.hardware import detect_hardware, MemoryTracker
 
 logger = logging.getLogger("benchlab.models")
