@@ -205,7 +205,7 @@ class MemoryTracker:
             if torch.cuda.is_available():
                 torch.cuda.reset_peak_memory_stats()
                 self.start_vram_bytes = torch.cuda.memory_allocated()
-            elif hasattr(torch, "mps") and hasattr(torch.mps, "current_allocated_memory"):
+            elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available() and hasattr(torch, "mps") and hasattr(torch.mps, "current_allocated_memory"):
                 self.start_vram_bytes = torch.mps.current_allocated_memory()
         except Exception:
             pass
@@ -222,7 +222,7 @@ class MemoryTracker:
                 current_vram = torch.cuda.max_memory_allocated()
                 if self.peak_vram_bytes is None or current_vram > self.peak_vram_bytes:
                     self.peak_vram_bytes = current_vram
-            elif hasattr(torch, "mps") and hasattr(torch.mps, "current_allocated_memory"):
+            elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available() and hasattr(torch, "mps") and hasattr(torch.mps, "current_allocated_memory"):
                 current_vram = torch.mps.current_allocated_memory()
                 if self.peak_vram_bytes is None or current_vram > self.peak_vram_bytes:
                     self.peak_vram_bytes = current_vram
@@ -239,7 +239,7 @@ class MemoryTracker:
             if torch.cuda.is_available():
                 self.end_vram_bytes = torch.cuda.memory_allocated()
                 self.peak_vram_bytes = torch.cuda.max_memory_allocated()
-            elif hasattr(torch, "mps") and hasattr(torch.mps, "current_allocated_memory"):
+            elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available() and hasattr(torch, "mps") and hasattr(torch.mps, "current_allocated_memory"):
                 self.end_vram_bytes = torch.mps.current_allocated_memory()
         except Exception:
             pass

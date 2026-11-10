@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from backend.app.api.v1.endpoints import (
     benchmark,
+    cost,
     datasets,
     evaluation,
     experiments,
@@ -74,6 +75,7 @@ app.include_router(training.router, prefix="/api/training", tags=["Fine-Tuning"]
 app.include_router(quantization.router, prefix="/api/quantization", tags=["Quantization"])
 app.include_router(inference.router, prefix="/api/inference", tags=["Inference"])
 app.include_router(benchmark.router, prefix="/api/benchmark", tags=["Benchmarking"])
+app.include_router(cost.router, prefix="/api/cost", tags=["Cost Analysis"])
 
 
 @app.get("/api/health", tags=["System"])

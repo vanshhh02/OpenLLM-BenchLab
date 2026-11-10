@@ -147,6 +147,6 @@ class ModelManager:
         cls._cached_precision = None
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
-        elif hasattr(torch, "mps") and hasattr(torch.mps, "empty_cache"):
+        elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available() and hasattr(torch, "mps") and hasattr(torch.mps, "empty_cache"):
             torch.mps.empty_cache()
 
