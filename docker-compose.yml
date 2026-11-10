@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    container_name: benchlab_backend
+    ports:
+      - "${PORT:-8000}:8000"
+    environment:
+      - DATABASE_URL=${DATABASE_URL:-sqlite:////app/artifacts/benchlab.db}
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+    volumes:
+      - ./artifacts:/app/artifacts
+      - ./configs:/app/configs
+      - ./experiments:/app/experiments
+    depends_on:
+      - mlflow
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    container_name: benchlab_frontend
+    ports:
+      - "${FRONTEND_PORT:-5173}:80"
+    depends_on:
+      - backend
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.11.0
+    container_name: benchlab_mlflow
+    ports:
+      - "${MLFLOW_PORT:-5000}:5000"
+    volumes:
+      - ./artifacts/mlruns:/mlflow/mlruns
+    command: mlflow server --backend-store-uri sqlite:////mlflow/mlruns/mlflow.db --default-artifact-root /mlflow/mlruns --host 0.0.0.0 --port 5000
+
+  # Optional production PostgreSQL database
+  # postgres:
+  #   image: postgres:16-alpine
+  #   container_name: benchlab_postgres
+  #   environment:
+  #     POSTGRES_USER: benchlab_user
+  #     POSTGRES_PASSWORD: benchlab_password
+  #     POSTGRES_DB: benchlab_db
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+

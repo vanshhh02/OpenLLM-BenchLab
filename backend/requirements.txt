@@ -1,0 +1,3 @@
+# Backend requirements (inherits core dependencies)
+-r ../requirements.txt
+

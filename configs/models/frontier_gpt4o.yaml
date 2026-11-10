@@ -1,0 +1,18 @@
+model_id: "openai/gpt-4o-mini"
+model_name: "OpenAI GPT-4o Mini (Frontier Baseline)"
+provider: "openai"
+architecture: "Commercial Proprietary API"
+parameter_count_b: 0.0
+context_window: 128000
+default_precision: "fp16-equivalent"
+is_commercial_api: true
+api_model_identifier: "gpt-4o-mini"
+min_ram_gb: 0.1
+min_vram_gb: 0.0
+supported_devices:
+  - "cloud-api"
+license: "Proprietary Commercial"
+task_types:
+  - "summarization"
+  - "instruction-tuning"
+

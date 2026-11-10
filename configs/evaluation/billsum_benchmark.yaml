@@ -1,0 +1,26 @@
+benchmark_name: "billsum_summarization_benchmark"
+dataset_name: "billsum"
+split: "ca_test"
+max_samples: 30
+max_input_length: 1024
+max_output_tokens: 256
+temperature: 0.1
+top_p: 0.9
+prompt_template: |
+  You are an expert legislative analyst. Provide a clear, factual, and concise summary of the following congressional bill.
+
+  Bill Text:
+  {text}
+
+  Summary:
+metrics:
+  - "rouge1"
+  - "rouge2"
+  - "rougeL"
+  - "bert_score"
+  - "latency_per_token"
+  - "tokens_per_second"
+  - "peak_memory_mb"
+batch_size: 1
+save_generations: true
+

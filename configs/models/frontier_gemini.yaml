@@ -1,0 +1,18 @@
+model_id: "google/gemini-1.5-flash"
+model_name: "Google Gemini 1.5 Flash (Frontier Baseline)"
+provider: "google"
+architecture: "Commercial Proprietary API"
+parameter_count_b: 0.0
+context_window: 1048576
+default_precision: "fp16-equivalent"
+is_commercial_api: true
+api_model_identifier: "gemini-1.5-flash"
+min_ram_gb: 0.1
+min_vram_gb: 0.0
+supported_devices:
+  - "cloud-api"
+license: "Proprietary Commercial"
+task_types:
+  - "summarization"
+  - "instruction-tuning"
+

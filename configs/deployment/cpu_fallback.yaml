@@ -1,0 +1,15 @@
+profile_name: "cpu_fallback"
+environment: "cpu"
+accelerator: "cpu"
+precision: "fp32"
+workers: 2
+quantization_support:
+  - "dynamic_int8"
+  - "gguf"
+inference_engine: "native_torch_cpu"
+vllm_enabled: false
+llamacpp_enabled: true
+max_concurrency: 4
+host: "127.0.0.1"
+port: 8000
+

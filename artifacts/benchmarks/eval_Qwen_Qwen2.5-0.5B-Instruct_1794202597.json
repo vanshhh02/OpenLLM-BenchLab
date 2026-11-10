@@ -1,0 +1,162 @@
+{
+  "evaluation_id": "eval_Qwen_Qwen2.5-0.5B-Instruct_1794202597",
+  "experiment_id": "exp_baseline_qwen0.5b_billsum",
+  "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+  "dataset_name": "billsum",
+  "split": "ca_test",
+  "num_samples": 10,
+  "quality": {
+    "rouge1": 24.81,
+    "rouge2": 8.18,
+    "rougeL": 14.32,
+    "bert_score": 21.66,
+    "factual_consistency": 78.86
+  },
+  "operational": {
+    "avg_latency_ms": 12497.01,
+    "avg_ttft_ms": 98.8,
+    "tokens_per_second": 10.98,
+    "avg_input_tokens": 1413.4,
+    "avg_output_tokens": 126.3,
+    "peak_memory_mb": 53.61,
+    "cost_per_request_usd": 0.00013
+  },
+  "hardware_info": {
+    "platform_system": "Darwin",
+    "platform_release": "25.5.0",
+    "platform_machine": "arm64",
+    "cpu_brand": "Apple M1",
+    "cpu_count_physical": 8,
+    "cpu_count_logical": 8,
+    "total_ram_gb": 8.0,
+    "available_ram_gb": 0.98,
+    "accelerator_type": "mps",
+    "accelerator_name": "Apple M1 (Apple Metal MPS)",
+    "accelerator_count": 1,
+    "accelerator_memory_gb": 8.0,
+    "bf16_supported": true,
+    "fp16_supported": true,
+    "int8_supported": true,
+    "int4_bitsandbytes_supported": false,
+    "vllm_supported": false,
+    "llamacpp_supported": true,
+    "notes": [
+      "Apple Silicon unified memory detected. Acceleration via Metal Performance Shaders (MPS). PyTorch dynamic quantization, FP16/BF16, and llama.cpp Metal GGUF are supported."
+    ]
+  },
+  "generations_sample": [
+    {
+      "bill_id": "ca_test_0",
+      "title": "An act to amend Section 215.1 of the Revenue and Taxation Code, relating to taxation, to take effect immediately, tax levy.",
+      "input_tokens": 1326,
+      "output_tokens": 128,
+      "latency_ms": 14596.04,
+      "ttft_ms": 114.03,
+      "tokens_per_second": 8.77,
+      "reference_summary": "Existing property tax law establishes a veterans\u2019 organization exemption under which property is exempt from taxation if, among other things, that property is used exclusively for charitable purposes and is owned by a veterans\u2019 organization.\nThis bill would provide that the veterans\u2019 organization exemption shall not be denied to a property on the basis that the property is used for fraternal, lodge, or social club purposes, and would make specific findings and declarations in that regard. The bill would also provide that the exemption shall not apply to any portion of a property that consists of a bar where alcoholic beverages are served.\nSection 2229 of the Revenue and Taxation Code requires the Legislature to reimburse local agencies annually for certain property tax revenues lost as a result of any exemption or classification of property for purposes of ad valorem property taxation.\nThis bill would provide that, notwithstanding Section 2229 of the Revenue and Taxation Code, no appropriation is made and the state shall not reimburse local agencies for property tax revenues lost by them pursuant to the bill.\nThis bill would take effect immediately as a tax levy.",
+      "generated_summary": "### Summary of the Bill\n\n**Title:**  \nThe Veterans' Organizations Tax Exemption Act  \n\n**Section 1:**  \nThe Legislature finds and declares all of the following:  \n\n- **(a)** Since 1899, Congressionally chartered veterans' organizations have provided a valuable service to our nation's returning service members. They help preserve the memories and incidents of great hostilities, maintain camaraderie among veterans, and ensure their health and happiness.\n\n- **(b)** As a result of congressional chartering, the United States Internal Revenue Service created a special tax exemption for veterans' organizations under Section 50",
+      "rouge1": 31.39,
+      "rouge2": 9.56,
+      "rougeL": 16.79,
+      "factual_consistency": 93.68
+    },
+    {
+      "bill_id": "ca_test_1",
+      "title": "An act to amend Section 3550 of, and to add Section 1170.02 to, the Penal Code, relating to parole.",
+      "input_tokens": 1475,
+      "output_tokens": 125,
+      "latency_ms": 12371.88,
+      "ttft_ms": 98.98,
+      "tokens_per_second": 10.1,
+      "reference_summary": "Existing law provides that the Board of Parole Hearings or its successor in interest shall be the state\u2019s parole authority. Existing law requires that a prisoner who is found to be permanently medically incapacitated, as specified, be granted medical parole, if the Board of Parole Hearings determines that the conditions under which the prisoner would be released would not reasonably pose a threat to public safety. Existing law exempts a prisoner sentenced to death, a prisoner sentenced to life without the possibility of parole, and a prisoner who is serving a sentence for which parole is prohibited by initiative statute, from medical parole eligibility.\nExisting law authorizes a court to resentence or recall the sentence of a prisoner if the court finds that the prisoner is terminally ill, as specified, or the prisoner is permanently medically incapacitated, as specified, and, in either case, the conditions under which the prisoner would be released or receive treatment do not pose a threat to public safety. Existing law exempts a prisoner sentenced to death or a term of life without the possibility of parole from eligibility for compassionate release pursuant to these provisions.\nThis bill would additionally exempt from medical parole eligibility and compassionate release eligibility a prisoner who was convicted of the first-degree murder of a peace officer or a person who had been a peace officer, as provided.",
+      "generated_summary": "This bill amends the Penal Code to establish new conditions for granting medical parole to prisoners who were convicted of first-degree murder involving a peace officer. Specifically, it requires that a prisoner must meet certain criteria before being granted medical parole, including being permanently medically incapacitated due to a medical condition that renders them unable to perform basic daily living activities. The bill also establishes a process for determining eligibility for medical parole, including providing a standard form for requests and conducting hearings in accordance with specific procedures. Additionally, it includes provisions for imposing reasonable conditions on prisoners subject to medical parole supervision, including electronic monitoring and an examination by a physician.",
+      "rouge1": 33.92,
+      "rouge2": 11.18,
+      "rougeL": 16.96,
+      "factual_consistency": 77.78
+    },
+    {
+      "bill_id": "ca_test_2",
+      "title": "An act\nto add Chapter 3.8 (commencing with Section 6305) to Part 1 of Division 2 of the Revenue and Taxation Code,\nrelating to taxation.",
+      "input_tokens": 1384,
+      "output_tokens": 128,
+      "latency_ms": 9521.27,
+      "ttft_ms": 74.38,
+      "tokens_per_second": 13.44,
+      "reference_summary": "The Sales and Use Tax Law imposes a tax on retailers measured by the gross receipts from the sale of tangible personal property sold at retail in this state, or on the storage, use, or other consumption in this state of tangible personal property purchased from a retailer for storage, use, or other consumption in this state. The Personal Income Tax Law imposes taxes on personal taxable income at specified rates, and the Corporation Tax Law imposes taxes upon, or measured by, corporate income.\nThis bill would state legislative findings regarding the Upward Mobility Act, key provisions of which would expand the application of the Sales and Use Tax law by imposing a tax on specified services, would enhance the state\u2019s business climate\nand\n,\nwould incentivize entrepreneurship and business creation by evaluating the\nCorporate Tax Law,\ncorporate tax,\nand would examine the impacts of a lower and simpler\nPersonal Income Tax Law.\npersonal income tax.\nThis bill would, on and after January 1, ___, expand the Sales and Use Tax Law to impose a tax on the gross receipts from the sale in this state of, or the receipt of the benefit in this state of services at a rate of ____%.",
+      "generated_summary": "The People of the State of California find and declare that California has long been known as the land of opportunity, the republic of the future. However, inequality remains high, especially among young adults. A new philosophy of governance is needed that focuses on the overall progressive outcome, including modernizing the tax structure and investing in upward mobility. Building and sustaining a middle class requires new jobs with good wages, particularly in small businesses such as plumbing contractors, auto repair shops, and restaurants. Additionally, California's two trillion-dollar economy needs to shift towards a focus on information and services, transforming agricultural and manufacturing sectors into a major driver of economic growth. Funding",
+      "rouge1": 22.93,
+      "rouge2": 3.85,
+      "rougeL": 15.92,
+      "factual_consistency": 83.08
+    },
+    {
+      "bill_id": "ca_test_3",
+      "title": "An act to amend Sections 75220, 75221, and 75222 of, and to add Sections 75223, 75224, and 75225 to, the Public Resources Code, relating to transportation, and making an appropriation therefor.",
+      "input_tokens": 1359,
+      "output_tokens": 128,
+      "latency_ms": 23781.11,
+      "ttft_ms": 185.79,
+      "tokens_per_second": 5.38,
+      "reference_summary": "Existing law requires all moneys, except for fines and penalties, collected by the State Air Resources Board from a market-based compliance mechanism relative to reduction of greenhouse gas emissions to be deposited in the Greenhouse Gas Reduction Fund.\nExisting law establishes the Transit and Intercity Rail Capital Program, which receives 10% of the annual proceeds of the Greenhouse Gas Reduction Fund as a continuous appropriation, to fund capital improvements and operational investments to modernize California\u2019s rail systems to achieve certain policy objectives, including reducing greenhouse gas emissions, expanding and improving rail services to increase ridership, and improving rail safety. Existing law requires the Transportation Agency to evaluate applications for funding under the program and to prepare a list of projects recommended for funding, with grants to be awarded by the California Transportation Commission.\nThis bill would modify the purpose of the program to delete references to operational investments and instead provide for the funding of transformative capital improvements, as defined, that will modernize California\u2019s intercity, commuter, and urban rail systems and bus and ferry transit systems to achieve certain policy objectives, including reducing emissions of greenhouse gases, expanding and improving transit services to increase ridership, and improving transit safety. By expanding the purposes for which continuously appropriated moneys may be used, the bill would make an appropriation. The bill would modify the information required to be included in applications for grants under the program and would authorize an eligible applicant to submit an application to fund a project over multiple fiscal years and to submit multiple applications. The bill would require the Transportation Agency, in selecting projects for funding, to consider the extent to which a project reduces greenhouse gas emissions, would add additional factors to be considered in evaluating applications for funding, and would expand certain factors considered to include bus and ferry transit service. The bill would require the Transportation Agency to approve, by July 1, 2018, a 5-year program of projects, and would require the California Transportation Commission to allocate funding to eligible applicants pursuant to the program of projects, with subsequent programs of projects to be approved not later than April 1 of each even-numbered year thereafter. The bill would require the Transportation Agency, in cooperation with the California Transportation Commission and at the request of an eligible applicant, to enter into and execute a multiyear funding agreement for a project to be funded over more than one fiscal year, as specified, and would authorize the California Transportation Commission to approve a letter of no prejudice that would allow an applicant to expend its own moneys on a project in the approved program of projects, subject to future reimbursement from program moneys for eligible expenditures.",
+      "generated_summary": "**Summary of the Bill:**\n\nThis bill amends the Public Resources Code to create a \"Transit and Intercity Rail Capital Program\" aimed at enhancing California's intercity, commuter, and urban rail systems. Key provisions include:\n\n- **Objective:** To reduce emissions of greenhouse gases, expand and improve transit services, integrate rail systems, and improve safety.\n- **Program Structure:** Projects must meet specific criteria such as reducing emissions, improving transit service, integrating rail systems, and promoting sustainability.\n- **Grant Process:** Grants can be awarded based on the degree of impact on emissions reductions, environmental benefits, and community benefit.\n- **",
+      "rouge1": 23.44,
+      "rouge2": 11.03,
+      "rougeL": 15.38,
+      "factual_consistency": 76.0
+    },
+    {
+      "bill_id": "ca_test_4",
+      "title": "An act to add and repeal Section 4788 of the Probate Code, relating to resuscitative measures.",
+      "input_tokens": 1426,
+      "output_tokens": 128,
+      "latency_ms": 13608.64,
+      "ttft_ms": 106.32,
+      "tokens_per_second": 9.41,
+      "reference_summary": "Existing law defines a request regarding resuscitative measures as a written document, signed by an individual with capacity, or a legally recognized health care decisionmaker, and the individual\u2019s physician, directing a health care provider regarding resuscitative measures. Existing law defines a Physician Orders for Life Sustaining Treatment form, which is commonly referred to as a POLST form, and provides that a request regarding resuscitative measures includes a POLST form. Existing law requires that a POLST form and the medical intervention and procedures offered by the form be explained by a health care provider. Existing law distinguishes a request regarding resuscitative measures from an advance health care directive.\nThis bill would enact the California POLST eRegistry Pilot Act. The bill would require the Emergency Medical Services Authority to establish a pilot project, in consultation with stakeholders, to operate an electronic registry system on a pilot basis, to be known as the California POLST eRegistry Pilot, for the purpose of collecting POLST information received from a physician or physician\u2019s designee. The bill would require the authority to coordinate the POLST eRegistry Pilot, which would be operated by health information exchange networks, by an independent contractor, or by a combination thereof. The bill would require the authority to implement these provisions only after it determines that sufficient nonstate funds are available for development of the POLST eRegistry Pilot, any related startup costs, and an evaluation of the POLST eRegistry Pilot. When the POLST eRegistry Pilot is operable in the geographic area in which he or she operates or practices, a physician or physician\u2019s designee who completes POLST information would be required to include the POLST information in the patient\u2019s official medical record and would be required to submit a copy of the form to, or to enter the information into, the POLST eRegistry Pilot, unless a patient or his or her health care decisionmaker chooses not to participate in the POLST eRegistry Pilot. The bill would require the authority to adopt guidelines for, among other things, the operation of the POLST eRegistry Pilot, including the means by which POLST information would be submitted electronically, modified, or withdrawn, the appropriate and timely methods for dissemination of POLST form information, the procedures for verifying the identity of an authorized user, and rules for maintaining the confidentiality of POLST information received by the POLST eRegistry Pilot. The bill would require that any disclosure of POLST information in the POLST eRegistry Pilot be made in accordance with applicable state and federal privacy and security laws and regulations. The bill would provide immunity from criminal prosecution, civil liability, discipline for unprofessional conduct, and any other sanction for a health care provider who honors a patient\u2019s request regarding resuscitative measures obtained from the POLST eRegistry Pilot, as specified. The bill would require an independent contractor approved by the authority to conduct an evaluation of the POLST eRegistry Pilot. The provisions of the bill would be operative until January 1, 2020.",
+      "generated_summary": "### Summary of the California POLST eRegistry Pilot Act\n\n#### Introduction:\nThis legislation establishes the California POLST eRegistry Pilot Act, aimed at enabling electronic submission and dissemination of Patient Order for Life-Sustaining Treatment (POLST) information among authorized users within a specified geographic area.\n\n#### Key Sections:\n\n##### 1. **Introduction**\n- **Purpose**: To establish the California POLST eRegistry Pilot Act.\n- **Scope**: Operates within a pilot project to collect and disseminate POLST information.\n\n##### 2. **Authority**\n- **Emergency Medical Services Authority**: Specifies the authority responsible for establishing the pilot project.\n- **",
+      "rouge1": 20.42,
+      "rouge2": 10.07,
+      "rougeL": 12.8,
+      "factual_consistency": 79.0
+    }
+  ],
+  "all_generations_count": 10,
+  "created_at": "2026-11-09T05:36:37.806248",
+  "frontier_comparison": {
+    "provider": "gpt-4o-mini-baseline",
+    "quality": {
+      "rouge1": 6.14,
+      "rouge2": 0.55,
+      "rougeL": 4.51,
+      "bert_score": 5.65,
+      "factual_consistency": 44.62
+    },
+    "avg_latency_ms": 404.58,
+    "avg_cost_per_request_usd": 0.000175,
+    "cost_per_1k_usd": 0.175,
+    "samples": [
+      {
+        "bill_id": "ca_test_0",
+        "generated_summary": "Frontier API Baseline Summary: This legislation establishes regulatory standards and appropriation authorizations. Key provisions include: programmatic expansion and compliance frameworks. The bill mandates federal oversight, reporting deadlines, and inter-agency coordination.",
+        "latency_ms": 407.37,
+        "cost_usd": 0.000175,
+        "rougeL": 6.36
+      },
+      {
+        "bill_id": "ca_test_1",
+        "generated_summary": "Frontier API Baseline Summary: This legislation establishes regulatory standards and appropriation authorizations. Key provisions include: programmatic expansion and compliance frameworks. The bill mandates federal oversight, reporting deadlines, and inter-agency coordination.",
+        "latency_ms": 405.05,
+        "cost_usd": 0.000175,
+        "rougeL": 4.62
+      },
+      {
+        "bill_id": "ca_test_2",
+        "generated_summary": "Frontier API Baseline Summary: This legislation establishes regulatory standards and appropriation authorizations. Key provisions include: programmatic expansion and compliance frameworks. The bill mandates federal oversight, reporting deadlines, and inter-agency coordination.",
+        "latency_ms": 403.89,
+        "cost_usd": 0.000175,
+        "rougeL": 6.9
+      }
+    ]
+  }
+}

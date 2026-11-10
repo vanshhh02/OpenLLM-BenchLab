@@ -1,0 +1,38 @@
+# OpenLLM BenchLab Dependencies
+
+# Core Deep Learning & NLP
+torch>=2.2.0
+transformers>=4.40.0
+datasets>=2.19.0
+peft>=0.10.0
+trl>=0.8.0
+accelerate>=0.29.0
+evaluate>=0.4.1
+rouge-score>=0.1.2
+bert-score>=0.3.13
+sentence-transformers>=2.6.0
+sentencepiece>=0.2.0
+tiktoken>=0.7.0
+scipy>=1.11.0
+numpy>=1.26.0
+
+# Backend & Web Serving
+fastapi>=0.110.0
+uvicorn[standard]>=0.28.0
+pydantic>=2.6.0
+pydantic-settings>=2.2.0
+sqlalchemy>=2.0.28
+aiosqlite>=0.20.0
+httpx>=0.27.0
+psutil>=5.9.8
+pyyaml>=6.0.1
+python-dotenv>=1.0.1
+
+# Experiment Tracking & Load Testing
+mlflow>=2.11.0
+locust>=2.24.0
+
+# Testing & Development
+pytest>=8.1.0
+pytest-asyncio>=0.23.0
+

@@ -1,0 +1,19 @@
+model_id: "google/gemma-2-2b-it"
+model_name: "Gemma 2 2B Instruct"
+provider: "huggingface"
+architecture: "Gemma2ForCausalLM"
+parameter_count_b: 2.61
+context_window: 8192
+default_precision: "bfloat16"
+is_commercial_api: false
+min_ram_gb: 6.0
+min_vram_gb: 5.5
+supported_devices:
+  - "cuda"
+  - "mps"
+  - "cpu"
+license: "Gemma Terms of Use"
+task_types:
+  - "summarization"
+  - "instruction-tuning"
+

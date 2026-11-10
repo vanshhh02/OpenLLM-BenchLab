@@ -1,0 +1,17 @@
+profile_name: "cuda_gpu"
+environment: "linux_cuda"
+accelerator: "cuda"
+precision: "bf16"
+workers: 4
+quantization_support:
+  - "bitsandbytes_nf4"
+  - "bitsandbytes_int8"
+  - "awq"
+  - "gptq"
+inference_engine: "vllm"
+vllm_enabled: true
+llamacpp_enabled: true
+max_concurrency: 50
+host: "0.0.0.0"
+port: 8000
+

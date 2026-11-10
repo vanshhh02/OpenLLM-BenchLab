@@ -1,0 +1,20 @@
+model_id: "Qwen/Qwen2.5-1.5B-Instruct"
+model_name: "Qwen 2.5 1.5B Instruct"
+provider: "huggingface"
+architecture: "Qwen2ForCausalLM"
+parameter_count_b: 1.54
+context_window: 32768
+default_precision: "fp16"
+is_commercial_api: false
+min_ram_gb: 4.5
+min_vram_gb: 3.2
+supported_devices:
+  - "cuda"
+  - "mps"
+  - "cpu"
+license: "Apache-2.0"
+task_types:
+  - "summarization"
+  - "instruction-tuning"
+chat_template: "{% for message in messages %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}"
+

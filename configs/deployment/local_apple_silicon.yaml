@@ -1,0 +1,16 @@
+profile_name: "local_apple_silicon"
+environment: "local"
+accelerator: "mps"
+precision: "fp16"
+workers: 1
+quantization_support:
+  - "dynamic_int8"
+  - "fp16"
+  - "gguf"
+inference_engine: "native_torch_mps"
+vllm_enabled: false
+llamacpp_enabled: true
+max_concurrency: 10
+host: "127.0.0.1"
+port: 8000
+
