@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from backend.app.core.hardware import detect_hardware
+from backend.app.core.security import RequestContext, get_request_context, require_min_role
 from backend.app.database.models import ModelRecord
 from backend.app.database.session import get_db
 from backend.app.schemas.api_schemas import (
@@ -116,7 +117,10 @@ PRECONFIGURED_MODELS = [
 
 
 @router.get("", response_model=List[ModelItemResponse])
-def list_models(db: Session = Depends(get_db)):
+def list_models(
+    ctx: RequestContext = Depends(get_request_context),
+    db: Session = Depends(get_db),
+):
     """List all registered open-weight models and commercial frontier models."""
     db_models = db.query(ModelRecord).all()
     if not db_models:
@@ -164,7 +168,11 @@ def list_models(db: Session = Depends(get_db)):
 
 
 @router.get("/{model_id:path}", response_model=ModelItemResponse)
-def get_model(model_id: str, db: Session = Depends(get_db)):
+def get_model(
+    model_id: str,
+    ctx: RequestContext = Depends(get_request_context),
+    db: Session = Depends(get_db),
+):
     """Get detailed metadata for a specific model."""
     m = db.query(ModelRecord).filter_by(id=model_id).first()
     if not m:
@@ -195,8 +203,12 @@ def get_model(model_id: str, db: Session = Depends(get_db)):
 
 
 @router.post("/load", response_model=Dict[str, Any])
-def load_model_endpoint(req: ModelLoadRequest):
+def load_model_endpoint(
+    req: ModelLoadRequest,
+    ctx: RequestContext = Depends(get_request_context),
+):
     """Load model weights into GPU/Metal VRAM or system RAM."""
+    require_min_role(ctx, "member")
     hw = detect_hardware()
     try:
         model, tokenizer, meta = ModelManager.load_model_and_tokenizer(

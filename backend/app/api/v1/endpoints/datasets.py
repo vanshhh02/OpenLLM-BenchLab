@@ -8,6 +8,7 @@ from typing import Any, Dict, List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from backend.app.core.security import RequestContext, get_request_context, require_min_role
 from backend.app.database.models import DatasetRecord
 from backend.app.database.session import get_db
 from backend.app.schemas.api_schemas import (
@@ -21,7 +22,10 @@ router = APIRouter()
 
 
 @router.get("", response_model=List[Dict[str, Any]])
-def list_datasets(db: Session = Depends(get_db)):
+def list_datasets(
+    ctx: RequestContext = Depends(get_request_context),
+    db: Session = Depends(get_db),
+):
     """List all registered datasets and their high-level record counts."""
     records = db.query(DatasetRecord).all()
     if not records:
@@ -65,9 +69,11 @@ def list_datasets(db: Session = Depends(get_db)):
 @router.post("/load", response_model=DatasetStatisticsResponse)
 def load_dataset_endpoint(
     req: DatasetLoadRequest,
+    ctx: RequestContext = Depends(get_request_context),
     db: Session = Depends(get_db),
 ):
     """Trigger dataset loading, validation, cleaning, and statistical profiling."""
+    require_min_role(ctx, "member")
     if req.dataset_name.lower() != "billsum":
         raise HTTPException(
             status_code=400,
@@ -106,6 +112,7 @@ def load_dataset_endpoint(
 @router.get("/{dataset_id}/statistics", response_model=DatasetStatisticsResponse)
 def get_dataset_statistics(
     dataset_id: str,
+    ctx: RequestContext = Depends(get_request_context),
     db: Session = Depends(get_db),
 ):
     """Retrieve detailed token length distributions and split statistics for a dataset."""

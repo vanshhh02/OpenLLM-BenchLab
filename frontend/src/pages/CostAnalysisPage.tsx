@@ -578,3 +578,4 @@ export const CostAnalysisPage: React.FC = () => {
     </div>
   );
 };
+

@@ -22,6 +22,7 @@
   - [Phase 5: Inference Serving, KV Cache Analysis & Load Testing](#phase-5-inference-serving-kv-cache-analysis--load-testing)
   - [Phase 6: Cost Analysis & Frontier ROI Modeling](#phase-6-cost-analysis--frontier-roi-modeling)
   - [Phase 7: Interactive Full-Stack React + Vite Dashboard](#phase-7-interactive-full-stack-react--vite-dashboard)
+  - [Phase 8: Auth, Multi-User Workspaces, Async Workers & Postgres Persistence](#phase-8-auth-multi-user-workspaces-async-workers--postgres-persistence)
 - [Quickstart Guide](#quickstart-guide)
   - [Local Installation](#local-installation)
   - [Docker Compose Deployment](#docker-compose-deployment)
@@ -146,7 +147,21 @@ Deploying Large Language Models in production requires navigating multidimension
   - **Inference & Serving**: Live summarization playground (TTFT & TPS), KV cache visualizer, multi-client load tester.
   - **Cost & ROI Calculator**: Real-time sliders for request volume, tokens, hardware rental, break-even visual badges, sensitivity table.
   - **Experiment Registry**: Filterable, sortable comparison table with Pareto frontier insights.
+  - **Workspaces & Jobs Console**: JWT login/registration, workspace RBAC switcher, scoped API keys, and async worker telemetry.
 - **Location**: `frontend/src/`.
+
+### Phase 8: Auth, Multi-User Workspaces, Async Workers & Postgres Persistence
+- **Authentication & API Keys**:
+  - PBKDF2-HMAC-SHA256 password hashing and HS256 JWT access/refresh tokens.
+  - Scoped `blab_*` API keys (SHA-256 hashed at rest) accepted via `X-API-Key` or `Authorization: Bearer`.
+  - Configurable `BENCHLAB_AUTH_REQUIRED=true` for strict multi-tenant enforcement (or `false` for local single-user dev mode).
+- **Multi-User Workspaces & RBAC**:
+  - Isolated workspaces (`owner`, `admin`, `member`, `viewer`) via `X-Workspace-ID` header and `ContextVar` scoping across experiments, evaluations, fine-tuning, quantization, benchmarks, and async jobs.
+- **Async Job Queue & Background Workers**:
+  - Unified `JobDispatcher` supporting Celery + Redis (`JOB_BACKEND=celery`) or in-process `ThreadPoolExecutor` fallback (`local_threadpool`), with persistent progress tracking and cancellation.
+- **PostgreSQL & Alembic Migrations**:
+  - Production PostgreSQL connection pooling in `backend/app/database/session.py`, `alembic` schema migrations (`alembic upgrade head`), and `scripts/migrate_sqlite_to_postgres.py` for zero-loss data migration.
+- **Location**: `backend/app/core/security.py`, `backend/app/workers/`, `backend/app/api/v1/endpoints/{auth,workspaces,jobs}.py`, `alembic/`.
 
 ---
 
@@ -263,6 +278,16 @@ python scripts/run_cost_analysis.py
 | `GET` | `/api/cost/hardware-presets` | Retrieve hardware specs and cloud rental presets |
 | `GET` | `/api/cost/pareto-analysis` | Compute Quality vs Cost vs Latency Pareto frontier |
 | `GET` | `/api/experiments` | Unified experiment registry with cross-comparison |
+| `POST` | `/api/auth/register` | Register a user, provision a personal workspace, and issue JWT tokens |
+| `POST` | `/api/auth/login` | Authenticate with email/password and issue access & refresh tokens |
+| `GET` | `/api/auth/api-keys` | List API keys scoped to the active workspace |
+| `POST` | `/api/auth/api-keys` | Generate a scoped `blab_*` API key |
+| `GET` | `/api/workspaces` | List workspaces accessible to the current user |
+| `POST` | `/api/workspaces` | Create a new isolated workspace |
+| `POST` | `/api/workspaces/{id}/members` | Invite/add a workspace member with an RBAC role |
+| `POST` | `/api/jobs/submit` | Enqueue an async training, evaluation, quantization, or load-test job |
+| `GET` | `/api/jobs` | List workspace async jobs and progress |
+| `POST` | `/api/jobs/{id}/cancel` | Cancel a queued or running async job |
 
 ---
 

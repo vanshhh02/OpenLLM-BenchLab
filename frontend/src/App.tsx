@@ -8,6 +8,7 @@ import { QuantizationPage } from './pages/QuantizationPage';
 import { InferencePage } from './pages/InferencePage';
 import { CostAnalysisPage } from './pages/CostAnalysisPage';
 import { ExperimentsPage } from './pages/ExperimentsPage';
+import { WorkspaceAuthPage } from './pages/WorkspaceAuthPage';
 import { api } from './services/api';
 import { HardwareProfile } from './types';
 
@@ -45,6 +46,7 @@ export const App: React.FC = () => {
             <Route path="/inference" element={<InferencePage />} />
             <Route path="/cost" element={<CostAnalysisPage />} />
             <Route path="/experiments" element={<ExperimentsPage />} />
+            <Route path="/workspace" element={<WorkspaceAuthPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
@@ -77,3 +79,4 @@ export const App: React.FC = () => {
 };
 
 export default App;
+

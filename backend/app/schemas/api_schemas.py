@@ -372,3 +372,134 @@ class ExperimentItemResponse(BaseModel):
 class ExperimentCompareRequest(BaseModel):
     experiment_ids: List[str]
 
+
+# -------------------------------------------------------------------------
+# Phase 8: Auth, Multi-User Workspaces, API Keys & Async Job Queue Schemas
+# -------------------------------------------------------------------------
+class UserRegisterRequest(BaseModel):
+    email: str = Field(..., min_length=3, max_length=255)
+    password: str = Field(..., min_length=6, max_length=128)
+    full_name: str = Field(default="", max_length=255)
+    workspace_name: Optional[str] = Field(default=None, max_length=255)
+
+
+class UserLoginRequest(BaseModel):
+    email: str
+    password: str
+    workspace_id: Optional[str] = None
+
+
+class RefreshTokenRequest(BaseModel):
+    refresh_token: str
+
+
+class UserSummary(BaseModel):
+    id: str
+    email: str
+    full_name: str
+    is_active: bool
+    is_superuser: bool = False
+    created_at: Optional[datetime.datetime] = None
+
+
+class WorkspaceSummary(BaseModel):
+    id: str
+    name: str
+    slug: str
+    description: Optional[str] = None
+    owner_id: Optional[str] = None
+    role: str = "member"
+    member_count: int = 1
+    created_at: Optional[datetime.datetime] = None
+
+
+class AuthTokenResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+    expires_in_seconds: int
+    user: UserSummary
+    workspace: WorkspaceSummary
+
+
+class AuthMeResponse(BaseModel):
+    authenticated: bool
+    auth_method: str
+    user: Optional[UserSummary] = None
+    workspace_id: str
+    workspace_role: str
+    scopes: List[str] = Field(default_factory=list)
+
+
+class ApiKeyCreateRequest(BaseModel):
+    name: str = Field(..., min_length=1, max_length=128)
+    scopes: List[str] = Field(default_factory=lambda: ["read", "write"])
+    expires_in_days: Optional[int] = Field(default=None, ge=1, le=3650)
+
+
+class ApiKeyResponse(BaseModel):
+    id: str
+    name: str
+    key_prefix: str
+    workspace_id: str
+    scopes: List[str] = Field(default_factory=list)
+    is_active: bool
+    last_used_at: Optional[datetime.datetime] = None
+    expires_at: Optional[datetime.datetime] = None
+    created_at: Optional[datetime.datetime] = None
+    raw_key: Optional[str] = None  # Returned only once upon creation
+
+
+class WorkspaceCreateRequest(BaseModel):
+    name: str = Field(..., min_length=2, max_length=255)
+    description: Optional[str] = None
+
+
+class WorkspaceUpdateRequest(BaseModel):
+    name: Optional[str] = Field(default=None, min_length=2, max_length=255)
+    description: Optional[str] = None
+    settings_json: Optional[Dict[str, Any]] = None
+
+
+class WorkspaceMemberAddRequest(BaseModel):
+    email: str
+    role: str = Field(default="member", pattern="^(owner|admin|member|viewer)$")
+
+
+class WorkspaceMemberUpdateRequest(BaseModel):
+    role: str = Field(..., pattern="^(owner|admin|member|viewer)$")
+
+
+class WorkspaceMemberResponse(BaseModel):
+    id: str
+    workspace_id: str
+    user_id: str
+    email: str
+    full_name: str
+    role: str
+    created_at: Optional[datetime.datetime] = None
+
+
+class AsyncJobSubmitRequest(BaseModel):
+    job_type: str = Field(..., pattern="^(training|evaluation|quantization|load_test)$")
+    payload: Dict[str, Any] = Field(default_factory=dict)
+
+
+class AsyncJobResponse(BaseModel):
+    id: str
+    workspace_id: str
+    created_by_user_id: Optional[str] = None
+    job_type: str
+    status: str
+    backend: str
+    celery_task_id: Optional[str] = None
+    payload_json: Dict[str, Any] = Field(default_factory=dict)
+    result_json: Optional[Dict[str, Any]] = None
+    progress_pct: float = 0.0
+    current_step: Optional[str] = None
+    error_message: Optional[str] = None
+    created_at: Optional[datetime.datetime] = None
+    started_at: Optional[datetime.datetime] = None
+    completed_at: Optional[datetime.datetime] = None
+
+

@@ -8,6 +8,7 @@ from typing import Any, Dict, List
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
+from backend.app.core.security import RequestContext, get_request_context, require_min_role
 from backend.app.database.models import QuantizationRecord
 from backend.app.database.session import get_db
 from backend.app.schemas.api_schemas import (
@@ -23,9 +24,11 @@ router = APIRouter()
 @router.post("/run", response_model=QuantizationResultItem)
 def run_quantization(
     req: QuantizationRunRequest,
+    ctx: RequestContext = Depends(get_request_context),
     db: Session = Depends(get_db),
 ) -> Any:
     """Execute model quantization using the specified method and precision format."""
+    require_min_role(ctx, "member")
     try:
         engine = QuantizationEngine()
         result = engine.run_quantization(
@@ -63,12 +66,16 @@ def run_quantization(
 @router.get("/results", response_model=List[QuantizationResultItem])
 def list_quantization_results(
     base_model_id: str = Query("Qwen/Qwen2.5-0.5B-Instruct", description="Filter by base model"),
+    ctx: RequestContext = Depends(get_request_context),
     db: Session = Depends(get_db),
 ) -> Any:
-    """List all completed or registered quantization benchmark records."""
+    """List all completed or registered quantization benchmark records in the active workspace."""
     records = (
         db.query(QuantizationRecord)
-        .filter(QuantizationRecord.base_model_id == base_model_id)
+        .filter(
+            QuantizationRecord.workspace_id == ctx.workspace_id,
+            QuantizationRecord.base_model_id == base_model_id,
+        )
         .order_by(QuantizationRecord.created_at.desc())
         .all()
     )
@@ -103,6 +110,7 @@ def list_quantization_results(
 @router.get("/comparison", response_model=List[Dict[str, Any]])
 def get_precision_comparison(
     base_model_id: str = Query("Qwen/Qwen2.5-0.5B-Instruct", description="Base model identifier"),
+    ctx: RequestContext = Depends(get_request_context),
     db: Session = Depends(get_db),
 ) -> Any:
     """Get cross-precision trade-off comparison matrix (FP16 vs INT8 vs INT4 vs GGUF)."""
@@ -114,10 +122,18 @@ def get_precision_comparison(
 @router.get("/{quant_id}", response_model=QuantizationResultItem)
 def get_quantization_detail(
     quant_id: str,
+    ctx: RequestContext = Depends(get_request_context),
     db: Session = Depends(get_db),
 ) -> Any:
     """Retrieve detailed metadata and metrics for a specific quantization run."""
-    record = db.query(QuantizationRecord).filter(QuantizationRecord.id == quant_id).first()
+    record = (
+        db.query(QuantizationRecord)
+        .filter(
+            QuantizationRecord.id == quant_id,
+            QuantizationRecord.workspace_id == ctx.workspace_id,
+        )
+        .first()
+    )
     if not record:
         raise HTTPException(status_code=404, detail=f"Quantization run '{quant_id}' not found")
 

@@ -422,3 +422,4 @@ export const InferencePage: React.FC = () => {
     </div>
   );
 };
+

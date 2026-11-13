@@ -10,6 +10,7 @@ import {
   BarChart3,
   Server,
   DollarSign,
+  Shield,
 } from 'lucide-react';
 import { HardwareProfile } from '../types';
 
@@ -27,6 +28,7 @@ export const Navbar: React.FC<NavbarProps> = ({ hardware, healthy }) => {
     { to: '/inference', label: 'Inference & Serving', icon: Zap },
     { to: '/cost', label: 'Cost & Frontier ROI', icon: DollarSign },
     { to: '/experiments', label: 'Experiments', icon: Database },
+    { to: '/workspace', label: 'Workspaces & Jobs', icon: Shield },
   ];
 
   return (
@@ -91,3 +93,4 @@ export const Navbar: React.FC<NavbarProps> = ({ hardware, healthy }) => {
     </header>
   );
 };
+

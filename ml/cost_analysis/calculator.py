@@ -490,3 +490,4 @@ class CostAnalysisEngine:
                 })
 
         return pareto_front
+

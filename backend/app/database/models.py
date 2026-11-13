@@ -1,22 +1,141 @@
-"""SQLAlchemy ORM models for OpenLLM BenchLab metadata and experiment storage.
-"""
+"""SQLAlchemy ORM models for OpenLLM BenchLab metadata, auth, workspaces, and job queues."""
 
 from __future__ import annotations
 
 import datetime
 from typing import Any, Dict, List, Optional
 
-from sqlalchemy import Boolean, Column, DateTime, Float, Integer, JSON, String, Text
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    JSON,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import declarative_base
+
+from backend.app.core.context import (
+    DEFAULT_WORKSPACE_ID,
+    get_current_user_id,
+    get_current_workspace_id,
+)
 
 Base = declarative_base()
 
 
+# -------------------------------------------------------------------------
+# Phase 8: Users, Multi-Tenant Workspaces, API Keys & Async Jobs
+# -------------------------------------------------------------------------
+class UserRecord(Base):
+    """Registered user accounts for JWT authentication and RBAC."""
+
+    __tablename__ = "users"
+
+    id = Column(String(128), primary_key=True, index=True)
+    email = Column(String(255), unique=True, nullable=False, index=True)
+    full_name = Column(String(255), nullable=False, default="")
+    hashed_password = Column(String(512), nullable=False)
+    is_active = Column(Boolean, default=True, nullable=False)
+    is_superuser = Column(Boolean, default=False, nullable=False)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+
+class WorkspaceRecord(Base):
+    """Isolated multi-user workspace for experiments, models, and jobs."""
+
+    __tablename__ = "workspaces"
+
+    id = Column(String(128), primary_key=True, index=True)
+    name = Column(String(255), nullable=False)
+    slug = Column(String(128), unique=True, nullable=False, index=True)
+    description = Column(Text, nullable=True)
+    owner_id = Column(String(128), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    settings_json = Column(JSON, default=dict)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+
+class WorkspaceMemberRecord(Base):
+    """Workspace membership and role-based access control (owner, admin, member, viewer)."""
+
+    __tablename__ = "workspace_members"
+    __table_args__ = (
+        UniqueConstraint("workspace_id", "user_id", name="uq_workspace_member"),
+    )
+
+    id = Column(String(128), primary_key=True, index=True)
+    workspace_id = Column(
+        String(128), ForeignKey("workspaces.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    user_id = Column(
+        String(128), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    role = Column(String(32), nullable=False, default="member")  # owner, admin, member, viewer
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+
+class ApiKeyRecord(Base):
+    """Scoped API keys for headless CI/CLI and programmatic access."""
+
+    __tablename__ = "api_keys"
+
+    id = Column(String(128), primary_key=True, index=True)
+    workspace_id = Column(
+        String(128), ForeignKey("workspaces.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    user_id = Column(
+        String(128), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    name = Column(String(128), nullable=False)
+    key_prefix = Column(String(32), nullable=False, index=True)
+    key_hash = Column(String(128), unique=True, nullable=False, index=True)
+    scopes = Column(JSON, default=list)
+    is_active = Column(Boolean, default=True, nullable=False)
+    last_used_at = Column(DateTime, nullable=True)
+    expires_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+
+class AsyncJobRecord(Base):
+    """Persistent async background job queue record (local threadpool or Celery/Redis)."""
+
+    __tablename__ = "async_jobs"
+
+    id = Column(String(128), primary_key=True, index=True)
+    workspace_id = Column(
+        String(128), default=get_current_workspace_id, nullable=False, index=True
+    )
+    created_by_user_id = Column(String(128), default=get_current_user_id, nullable=True)
+    job_type = Column(String(64), nullable=False, index=True)  # training, evaluation, quantization, load_test
+    status = Column(String(32), nullable=False, default="queued", index=True)  # queued, running, completed, failed, cancelled
+    backend = Column(String(32), nullable=False, default="local_threadpool")
+    celery_task_id = Column(String(128), nullable=True)
+    payload_json = Column(JSON, default=dict)
+    result_json = Column(JSON, nullable=True)
+    progress_pct = Column(Float, default=0.0)
+    current_step = Column(String(255), nullable=True)
+    error_message = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    started_at = Column(DateTime, nullable=True)
+    completed_at = Column(DateTime, nullable=True)
+
+
+# -------------------------------------------------------------------------
+# Domain Tables (Workspace-Scoped)
+# -------------------------------------------------------------------------
 class ModelRecord(Base):
     """Registered open-weight or commercial models."""
     __tablename__ = "models"
 
     id = Column(String(128), primary_key=True, index=True)
+    workspace_id = Column(
+        String(128), default=get_current_workspace_id, nullable=False, index=True
+    )
+    created_by_user_id = Column(String(128), default=get_current_user_id, nullable=True)
     name = Column(String(255), nullable=False)
     provider = Column(String(64), default="huggingface")
     architecture = Column(String(128), default="Decoder-Only Transformer")
@@ -39,6 +158,10 @@ class DatasetRecord(Base):
     __tablename__ = "datasets"
 
     id = Column(String(128), primary_key=True, index=True)
+    workspace_id = Column(
+        String(128), default=get_current_workspace_id, nullable=False, index=True
+    )
+    created_by_user_id = Column(String(128), default=get_current_user_id, nullable=True)
     name = Column(String(128), nullable=False)
     description = Column(Text, nullable=True)
     train_count = Column(Integer, default=0)
@@ -58,6 +181,10 @@ class EvaluationRecord(Base):
     __tablename__ = "evaluations"
 
     id = Column(String(128), primary_key=True, index=True)
+    workspace_id = Column(
+        String(128), default=get_current_workspace_id, nullable=False, index=True
+    )
+    created_by_user_id = Column(String(128), default=get_current_user_id, nullable=True)
     experiment_id = Column(String(128), index=True, nullable=True)
     model_id = Column(String(128), index=True, nullable=False)
     dataset_name = Column(String(128), default="billsum")
@@ -90,6 +217,10 @@ class TrainingJobRecord(Base):
     __tablename__ = "training_jobs"
 
     id = Column(String(128), primary_key=True, index=True)
+    workspace_id = Column(
+        String(128), default=get_current_workspace_id, nullable=False, index=True
+    )
+    created_by_user_id = Column(String(128), default=get_current_user_id, nullable=True)
     base_model_id = Column(String(128), nullable=False)
     method = Column(String(32), default="lora")  # lora or qlora
     status = Column(String(32), default="pending")  # pending, running, completed, failed
@@ -114,6 +245,10 @@ class QuantizationRecord(Base):
     __tablename__ = "quantizations"
 
     id = Column(String(128), primary_key=True, index=True)
+    workspace_id = Column(
+        String(128), default=get_current_workspace_id, nullable=False, index=True
+    )
+    created_by_user_id = Column(String(128), default=get_current_user_id, nullable=True)
     base_model_id = Column(String(128), nullable=False)
     quantized_model_id = Column(String(128), nullable=False)
     method = Column(String(64), nullable=False)
@@ -138,6 +273,10 @@ class BenchmarkRecord(Base):
     __tablename__ = "benchmarks"
 
     id = Column(String(128), primary_key=True, index=True)
+    workspace_id = Column(
+        String(128), default=get_current_workspace_id, nullable=False, index=True
+    )
+    created_by_user_id = Column(String(128), default=get_current_user_id, nullable=True)
     model_id = Column(String(128), nullable=False)
     benchmark_type = Column(String(32), default="load_test")  # single, concurrent, continuous_batching
     concurrency_level = Column(Integer, default=1)
@@ -163,6 +302,10 @@ class ExperimentRecord(Base):
     __tablename__ = "experiments"
 
     id = Column(String(128), primary_key=True, index=True)
+    workspace_id = Column(
+        String(128), default=get_current_workspace_id, nullable=False, index=True
+    )
+    created_by_user_id = Column(String(128), default=get_current_user_id, nullable=True)
     name = Column(String(255), nullable=False)
     model_id = Column(String(128), nullable=False)
     category = Column(String(64), default="baseline")  # baseline, lora, qlora, quantized, commercial_api
@@ -179,4 +322,3 @@ class ExperimentRecord(Base):
     metrics = Column(JSON, default=dict)
     mlflow_run_id = Column(String(128), nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
-

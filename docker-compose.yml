@@ -1,6 +1,34 @@
 version: '3.8'
 
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: benchlab_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-benchlab_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-benchlab_password}
+      POSTGRES_DB: ${POSTGRES_DB:-benchlab_db}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-benchlab_user} -d ${POSTGRES_DB:-benchlab_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: benchlab_redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   backend:
     build:
       context: .
@@ -9,7 +37,13 @@ services:
     ports:
       - "${PORT:-8000}:8000"
     environment:
-      - DATABASE_URL=${DATABASE_URL:-sqlite:////app/artifacts/benchlab.db}
+      - DATABASE_URL=${DATABASE_URL:-postgresql+psycopg://benchlab_user:benchlab_password@postgres:5432/benchlab_db}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND:-redis://redis:6379/1}
+      - JOB_BACKEND=${JOB_BACKEND:-auto}
+      - BENCHLAB_AUTH_REQUIRED=${BENCHLAB_AUTH_REQUIRED:-false}
+      - BENCHLAB_SECRET_KEY=${BENCHLAB_SECRET_KEY:-benchlab-docker-secret-change-me}
       - MLFLOW_TRACKING_URI=http://mlflow:5000
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
@@ -19,7 +53,36 @@ services:
       - ./configs:/app/configs
       - ./experiments:/app/experiments
     depends_on:
-      - mlflow
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mlflow:
+        condition: service_started
+
+  celery_worker:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    container_name: benchlab_celery_worker
+    command: celery -A backend.app.workers.celery_app.celery_app worker --loglevel=info --concurrency=2
+    environment:
+      - DATABASE_URL=${DATABASE_URL:-postgresql+psycopg://benchlab_user:benchlab_password@postgres:5432/benchlab_db}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND:-redis://redis:6379/1}
+      - JOB_BACKEND=celery
+      - BENCHLAB_SECRET_KEY=${BENCHLAB_SECRET_KEY:-benchlab-docker-secret-change-me}
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    volumes:
+      - ./artifacts:/app/artifacts
+      - ./configs:/app/configs
+      - ./experiments:/app/experiments
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
   frontend:
     build:
@@ -40,19 +103,5 @@ services:
       - ./artifacts/mlruns:/mlflow/mlruns
     command: mlflow server --backend-store-uri sqlite:////mlflow/mlruns/mlflow.db --default-artifact-root /mlflow/mlruns --host 0.0.0.0 --port 5000
 
-  # Optional production PostgreSQL database
-  # postgres:
-  #   image: postgres:16-alpine
-  #   container_name: benchlab_postgres
-  #   environment:
-  #     POSTGRES_USER: benchlab_user
-  #     POSTGRES_PASSWORD: benchlab_password
-  #     POSTGRES_DB: benchlab_db
-  #   ports:
-  #     - "5432:5432"
-  #   volumes:
-  #     - postgres_data:/var/lib/postgresql/data
-
 volumes:
   postgres_data:
-

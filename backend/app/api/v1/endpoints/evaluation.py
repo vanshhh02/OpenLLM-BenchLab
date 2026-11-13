@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from backend.app.core.security import RequestContext, get_request_context, require_min_role
 from backend.app.database.models import EvaluationRecord, ExperimentRecord
 from backend.app.database.session import get_db
 from backend.app.schemas.api_schemas import (
@@ -22,9 +23,17 @@ router = APIRouter()
 
 
 @router.get("/results", response_model=List[EvaluationResultItem])
-def get_evaluation_results(db: Session = Depends(get_db)):
-    """Retrieve all evaluation benchmarks recorded in the database."""
-    records = db.query(EvaluationRecord).order_by(EvaluationRecord.created_at.desc()).all()
+def get_evaluation_results(
+    ctx: RequestContext = Depends(get_request_context),
+    db: Session = Depends(get_db),
+):
+    """Retrieve all evaluation benchmarks recorded in the active workspace."""
+    records = (
+        db.query(EvaluationRecord)
+        .filter_by(workspace_id=ctx.workspace_id)
+        .order_by(EvaluationRecord.created_at.desc())
+        .all()
+    )
     return [
         EvaluationResultItem(
             id=r.id,
@@ -57,9 +66,11 @@ def get_evaluation_results(db: Session = Depends(get_db)):
 def run_evaluation_endpoint(
     req: EvaluationRunRequest,
     background_tasks: BackgroundTasks,
+    ctx: RequestContext = Depends(get_request_context),
     db: Session = Depends(get_db),
 ):
     """Trigger an evaluation run on BillSum test split with optional commercial API comparison."""
+    require_min_role(ctx, "member")
     # Execute evaluation synchronously or in background
     evaluator = BaselineEvaluator()
     try:
@@ -90,10 +101,11 @@ def run_evaluation_endpoint(
 @router.get("/compare", response_model=EvaluationCompareResponse)
 def compare_evaluations(
     ids: Optional[str] = None,
+    ctx: RequestContext = Depends(get_request_context),
     db: Session = Depends(get_db),
 ):
     """Compare evaluation results across multiple models and benchmarks."""
-    query = db.query(EvaluationRecord)
+    query = db.query(EvaluationRecord).filter(EvaluationRecord.workspace_id == ctx.workspace_id)
     if ids:
         id_list = [i.strip() for i in ids.split(",") if i.strip()]
         query = query.filter(EvaluationRecord.id.in_(id_list))

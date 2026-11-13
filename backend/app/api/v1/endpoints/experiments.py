@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from backend.app.core.security import RequestContext, get_request_context
 from backend.app.database.models import ExperimentRecord
 from backend.app.database.session import get_db
 from backend.app.schemas.api_schemas import (
@@ -20,9 +21,17 @@ router = APIRouter()
 
 
 @router.get("", response_model=List[ExperimentItemResponse])
-def list_experiments(db: Session = Depends(get_db)):
-    """List all registered benchmark and fine-tuning experiments."""
-    records = db.query(ExperimentRecord).order_by(ExperimentRecord.created_at.desc()).all()
+def list_experiments(
+    ctx: RequestContext = Depends(get_request_context),
+    db: Session = Depends(get_db),
+):
+    """List all registered benchmark and fine-tuning experiments in the active workspace."""
+    records = (
+        db.query(ExperimentRecord)
+        .filter_by(workspace_id=ctx.workspace_id)
+        .order_by(ExperimentRecord.created_at.desc())
+        .all()
+    )
     return [
         ExperimentItemResponse(
             id=r.id,
@@ -48,9 +57,13 @@ def list_experiments(db: Session = Depends(get_db)):
 
 
 @router.get("/{experiment_id}", response_model=ExperimentItemResponse)
-def get_experiment(experiment_id: str, db: Session = Depends(get_db)):
+def get_experiment(
+    experiment_id: str,
+    ctx: RequestContext = Depends(get_request_context),
+    db: Session = Depends(get_db),
+):
     """Retrieve full details and metrics for an individual experiment."""
-    r = db.query(ExperimentRecord).filter_by(id=experiment_id).first()
+    r = db.query(ExperimentRecord).filter_by(id=experiment_id, workspace_id=ctx.workspace_id).first()
     if not r:
         raise HTTPException(status_code=404, detail=f"Experiment '{experiment_id}' not found.")
 
@@ -78,10 +91,18 @@ def get_experiment(experiment_id: str, db: Session = Depends(get_db)):
 @router.post("/compare", response_model=Dict[str, Any])
 def compare_experiments(
     req: ExperimentCompareRequest,
+    ctx: RequestContext = Depends(get_request_context),
     db: Session = Depends(get_db),
 ):
     """Perform side-by-side multi-metric comparative analysis across selected experiments."""
-    records = db.query(ExperimentRecord).filter(ExperimentRecord.id.in_(req.experiment_ids)).all()
+    records = (
+        db.query(ExperimentRecord)
+        .filter(
+            ExperimentRecord.workspace_id == ctx.workspace_id,
+            ExperimentRecord.id.in_(req.experiment_ids),
+        )
+        .all()
+    )
     if not records:
         raise HTTPException(status_code=404, detail="No matching experiments found for comparison.")
 

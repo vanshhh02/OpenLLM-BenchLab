@@ -63,3 +63,4 @@ def test_pareto_analysis_endpoint():
     assert "pareto_optimal_count" in data
     assert "pareto_frontier" in data
     assert isinstance(data["pareto_frontier"], list)
+

@@ -8,6 +8,7 @@ from typing import Any, Dict, List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+from backend.app.core.security import RequestContext, get_request_context
 from backend.app.database.models import EvaluationRecord, ExperimentRecord
 from backend.app.database.session import get_db
 from backend.app.schemas.api_schemas import (
@@ -27,7 +28,10 @@ router = APIRouter()
 
 
 @router.post("/calculate", response_model=CostCalculationResponse)
-def calculate_cost_and_roi(req: CostCalculationRequest):
+def calculate_cost_and_roi(
+    req: CostCalculationRequest,
+    ctx: RequestContext = Depends(get_request_context),
+):
     """Compute complete comparative cost analysis, break-even requests, and sensitivity curve."""
     result = CostCalculator.analyze(
         monthly_requests=req.monthly_requests,
@@ -79,9 +83,12 @@ def list_hardware_presets() -> Dict[str, Any]:
 
 
 @router.get("/pareto-analysis")
-def get_pareto_analysis(db: Session = Depends(get_db)) -> Dict[str, Any]:
+def get_pareto_analysis(
+    ctx: RequestContext = Depends(get_request_context),
+    db: Session = Depends(get_db),
+) -> Dict[str, Any]:
     """Analyze all registered model evaluations to construct Quality vs Cost vs Latency Pareto frontier."""
-    experiments = db.query(ExperimentRecord).all()
+    experiments = db.query(ExperimentRecord).filter_by(workspace_id=ctx.workspace_id).all()
     records = []
     for exp in experiments:
         records.append({
@@ -103,3 +110,4 @@ def get_pareto_analysis(db: Session = Depends(get_db)) -> Dict[str, Any]:
         "pareto_frontier": pareto_models,
         "all_records": records,
     }
+

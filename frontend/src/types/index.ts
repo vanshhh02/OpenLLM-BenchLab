@@ -224,3 +224,91 @@ export interface KVCacheStats {
     memory_mb: number;
   }>;
 }
+
+// Phase 8: Auth, Multi-User Workspaces, API Keys & Async Jobs
+export interface UserSummary {
+  id: string;
+  email: string;
+  full_name: string;
+  is_active: boolean;
+  is_superuser: boolean;
+  created_at?: string;
+}
+
+export interface WorkspaceSummary {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  owner_id?: string;
+  role: string;
+  member_count: number;
+  created_at?: string;
+}
+
+export interface AuthTokenResponse {
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
+  expires_in_seconds: number;
+  user: UserSummary;
+  workspace: WorkspaceSummary;
+}
+
+export interface AuthMeResponse {
+  authenticated: boolean;
+  auth_method: string;
+  user?: UserSummary | null;
+  workspace_id: string;
+  workspace_role: string;
+  scopes: string[];
+}
+
+export interface ApiKeyItem {
+  id: string;
+  name: string;
+  key_prefix: string;
+  workspace_id: string;
+  scopes: string[];
+  is_active: boolean;
+  last_used_at?: string;
+  expires_at?: string;
+  created_at?: string;
+  raw_key?: string;
+}
+
+export interface WorkspaceMemberItem {
+  id: string;
+  workspace_id: string;
+  user_id: string;
+  email: string;
+  full_name: string;
+  role: 'owner' | 'admin' | 'member' | 'viewer';
+  created_at?: string;
+}
+
+export interface AsyncJobItem {
+  id: string;
+  workspace_id: string;
+  created_by_user_id?: string;
+  job_type: 'training' | 'evaluation' | 'quantization' | 'load_test';
+  status: 'queued' | 'running' | 'completed' | 'failed' | 'cancelled';
+  backend: string;
+  celery_task_id?: string;
+  payload_json: Record<string, any>;
+  result_json?: Record<string, any> | null;
+  progress_pct: number;
+  current_step?: string;
+  error_message?: string;
+  created_at?: string;
+  started_at?: string;
+  completed_at?: string;
+}
+
+export interface WorkerHealthResponse {
+  backend: string;
+  celery_configured: boolean;
+  active_local_futures: number;
+  workspace_job_counts: Record<string, number>;
+  total_jobs: number;
+}

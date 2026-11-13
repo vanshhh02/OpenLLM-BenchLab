@@ -9,6 +9,8 @@ from typing import Any, Dict, List
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from backend.app.core.context import workspace_scope
+from backend.app.core.security import RequestContext, get_request_context, require_min_role
 from backend.app.database.models import TrainingJobRecord
 from backend.app.database.session import get_db
 from backend.app.schemas.api_schemas import (
@@ -22,11 +24,16 @@ logger = logging.getLogger("benchlab.api.training")
 router = APIRouter()
 
 
-def _run_training_background(config: TrainingConfig) -> None:
+def _run_training_background(
+    config: TrainingConfig,
+    workspace_id: str,
+    user_id: str | None = None,
+) -> None:
     """Execute training in an asynchronous background worker thread."""
     try:
-        engine = FineTuningEngine()
-        engine.train(config)
+        with workspace_scope(workspace_id, user_id):
+            engine = FineTuningEngine()
+            engine.train(config)
     except Exception as e:
         logger.error(f"Background training failed for job {config.job_id}: {e}")
         # Mark failed in DB
@@ -48,9 +55,11 @@ def _run_training_background(config: TrainingConfig) -> None:
 def start_training(
     req: TrainingStartRequest,
     background_tasks: BackgroundTasks,
+    ctx: RequestContext = Depends(get_request_context),
     db: Session = Depends(get_db),
 ):
     """Start an asynchronous LoRA or QLoRA fine-tuning run."""
+    require_min_role(ctx, "member")
     import time
     job_id = f"{req.method}_qwen_{int(time.time())}"
 
@@ -80,6 +89,8 @@ def start_training(
     # Insert pending record in database
     job_record = TrainingJobRecord(
         id=job_id,
+        workspace_id=ctx.workspace_id,
+        created_by_user_id=ctx.user_id,
         base_model_id=req.base_model_id,
         method=req.method,
         status="pending",
@@ -89,7 +100,11 @@ def start_training(
     db.commit()
 
     # Launch in background thread
-    worker = threading.Thread(target=_run_training_background, args=(train_cfg,), daemon=True)
+    worker = threading.Thread(
+        target=_run_training_background,
+        args=(train_cfg, ctx.workspace_id, ctx.user_id),
+        daemon=True,
+    )
     worker.start()
 
     logger.info(f"Dispatched training job '{job_id}' in background worker.")
@@ -105,9 +120,13 @@ def start_training(
 
 
 @router.get("/status/{job_id}", response_model=TrainingStatusResponse)
-def get_training_status(job_id: str, db: Session = Depends(get_db)):
+def get_training_status(
+    job_id: str,
+    ctx: RequestContext = Depends(get_request_context),
+    db: Session = Depends(get_db),
+):
     """Poll live progress, loss curves, and parameter statistics for a fine-tuning run."""
-    job = db.query(TrainingJobRecord).filter_by(id=job_id).first()
+    job = db.query(TrainingJobRecord).filter_by(id=job_id, workspace_id=ctx.workspace_id).first()
     if not job:
         raise HTTPException(status_code=404, detail=f"Training job '{job_id}' not found.")
 
@@ -134,9 +153,17 @@ def get_training_status(job_id: str, db: Session = Depends(get_db)):
 
 
 @router.get("/history", response_model=List[TrainingStatusResponse])
-def get_training_history(db: Session = Depends(get_db)):
-    """Retrieve full history of all fine-tuning runs."""
-    jobs = db.query(TrainingJobRecord).order_by(TrainingJobRecord.created_at.desc()).all()
+def get_training_history(
+    ctx: RequestContext = Depends(get_request_context),
+    db: Session = Depends(get_db),
+):
+    """Retrieve full history of all fine-tuning runs in the active workspace."""
+    jobs = (
+        db.query(TrainingJobRecord)
+        .filter_by(workspace_id=ctx.workspace_id)
+        .order_by(TrainingJobRecord.created_at.desc())
+        .all()
+    )
     return [
         TrainingStatusResponse(
             id=job.id,

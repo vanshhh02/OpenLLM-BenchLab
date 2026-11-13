@@ -8,6 +8,7 @@ from typing import Any, Dict, List
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
 
+from backend.app.core.security import RequestContext, get_request_context, require_min_role
 from backend.app.schemas.api_schemas import (
     BatchInferenceRequest,
     BatchInferenceResponse,
@@ -23,8 +24,12 @@ router = APIRouter()
 
 
 @router.post("/generate", response_model=InferenceGenerateResponse)
-def generate_text(req: InferenceGenerateRequest) -> Any:
+def generate_text(
+    req: InferenceGenerateRequest,
+    ctx: RequestContext = Depends(get_request_context),
+) -> Any:
     """Execute single-prompt generation with Time-To-First-Token and throughput metrics."""
+    require_min_role(ctx, "member")
     try:
         engine = InferenceEngine(model_id=req.model_id)
         res = engine.generate(
@@ -40,8 +45,12 @@ def generate_text(req: InferenceGenerateRequest) -> Any:
 
 
 @router.post("/batch", response_model=BatchInferenceResponse)
-def generate_batch_text(req: BatchInferenceRequest) -> Any:
+def generate_batch_text(
+    req: BatchInferenceRequest,
+    ctx: RequestContext = Depends(get_request_context),
+) -> Any:
     """Execute dynamic batch inference across multiple prompts with dynamic padding."""
+    require_min_role(ctx, "member")
     try:
         engine = InferenceEngine(model_id=req.model_id)
         res = engine.generate_batch(
@@ -61,8 +70,10 @@ def stream_generation(
     model_id: str = Query("Qwen/Qwen2.5-0.5B-Instruct", description="Target model"),
     max_tokens: int = Query(128, description="Maximum tokens to generate"),
     temperature: float = Query(0.1, description="Sampling temperature"),
+    ctx: RequestContext = Depends(get_request_context),
 ) -> StreamingResponse:
     """Stream generated tokens in real time via Server-Sent Events (SSE)."""
+    require_min_role(ctx, "member")
     try:
         engine = InferenceEngine(model_id=model_id)
 

@@ -10,15 +10,18 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.app.api.v1.endpoints import (
+    auth,
     benchmark,
     cost,
     datasets,
     evaluation,
     experiments,
     inference,
+    jobs,
     models,
     quantization,
     training,
+    workspaces,
 )
 from backend.app.core.hardware import detect_hardware
 from backend.app.database.session import init_db
@@ -67,6 +70,9 @@ app.add_middleware(
 )
 
 # Include API Routers
+app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
+app.include_router(workspaces.router, prefix="/api/workspaces", tags=["Workspaces"])
+app.include_router(jobs.router, prefix="/api/jobs", tags=["Async Jobs"])
 app.include_router(datasets.router, prefix="/api/datasets", tags=["Datasets"])
 app.include_router(models.router, prefix="/api/models", tags=["Models"])
 app.include_router(evaluation.router, prefix="/api/evaluation", tags=["Evaluation"])

@@ -127,3 +127,4 @@ def test_pareto_frontier_computation():
     assert "m2" in pareto_ids
     assert "m3" in pareto_ids
     assert "m4" in pareto_ids
+
